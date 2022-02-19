@@ -1345,9 +1345,7 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 	}
 	else if (mode == MODE_CUEBIN)
 	{
-		// first track specifies the file
-		if (tracknum == 0)
-			file.printf("FILE \"%s\" BINARY\n", filename);
+		file.printf("FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
 		std::string tempstr;
@@ -2466,7 +2464,7 @@ static void do_extract_cd(parameters_map &params)
 			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
 
 		// process output BIN file
-		if (mode != MODE_GDI)
+		if (mode != MODE_GDI && mode != MODE_CUEBIN)
 		{
 			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
 			if (filerr)
@@ -2528,7 +2526,7 @@ static void do_extract_cd(parameters_map &params)
 		{
 			std::string trackbin_name(basename);
 
-			if (mode == MODE_GDI)
+			if (mode == MODE_GDI || mode == MODE_CUEBIN)
 			{
 				char temp[11];
 				sprintf(temp, "%02d", tracknum+1);
@@ -2549,7 +2547,7 @@ static void do_extract_cd(parameters_map &params)
 
 			// output the metadata about the track to the TOC file
 			const cdrom_file::track_info &trackinfo = toc.tracks[tracknum];
-			if (mode == MODE_GDI)
+			if (mode == MODE_GDI || mode == MODE_CUEBIN)
 			{
 				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 			}
